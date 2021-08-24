@@ -1,5 +1,5 @@
 import React from 'react';
-import { ApolloClient, InMemoryCache, ApolloProvider, createHttpLink, } from '@apollo/client';
+import { ApolloClient, InMemoryCache, createHttpLink, ApolloProvider} from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import SearchBooks from './pages/SearchBooks';
@@ -23,13 +23,15 @@ const authLink = setContext((_, { headers }) => {
 });
 
 const client = new ApolloClient({
-  
-  link: authLink.concat(httpLink),
+  uri: "/graphql",
   cache: new InMemoryCache(),
+  connectToDevTools: true,
 });
+
 
 function App() {
   return (
+    <ApolloProvider client={client}>
     <Router>
       <>
         <Navbar />
@@ -40,9 +42,8 @@ function App() {
         </Switch>
       </>
     </Router>
+    </ApolloProvider>
   );
 }
 
 export default App;
-
-

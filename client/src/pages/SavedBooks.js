@@ -1,19 +1,18 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Jumbotron, Container, CardColumns, Card, Button } from 'react-bootstrap';
 
 import Auth from '../utils/auth';
 import { removeBookId } from '../utils/localStorage';
 
 import { useMutation, useQuery } from '@apollo/client';
-import { REMOVE_BOOK } from '../utils/mutations';
+import { DELETE_BOOK } from '../utils/mutations';
 import { GET_ME } from '../utils/queries';
 
 const SavedBooks = () => {
 
-  const { loading, data } = useQuery( GET_ME );
+  const { data } = useQuery( GET_ME );
+  const [removeBook] = useMutation(DELETE_BOOK);
   const userData = data?.me || {};
-
-  const [userData, setUserData] = useState({});
 
   // use this to determine if `useEffect()` hook needs to run again
   const userDataLength = Object.keys(userData).length; 
@@ -26,15 +25,10 @@ const SavedBooks = () => {
       return false;
     }
 
-    try {
-      const { loading, data } = useMutation(REMOVE_BOOK);
-      const updatedUser = await response.json();
-      setUserData(updatedUser);
-      // upon success, remove book's id from localStorage
-      removeBookId(bookId);
-    } catch (err) {
-      console.error(err);
-    }
+    removeBook(bookId);
+    // upon success, remove book's id from localStorage
+    removeBookId(bookId);
+  
   };
 
   // if data isn't here yet, say so
