@@ -3,39 +3,41 @@ import { Jumbotron, Container, CardColumns, Card, Button } from 'react-bootstrap
 
 import Auth from '../utils/auth';
 import { removeBookId } from '../utils/localStorage';
-
 import { useMutation, useQuery } from '@apollo/client';
-import { DELETE_BOOK } from '../utils/mutations';
 import { GET_ME } from '../utils/queries';
-
+import { DELETE_BOOK } from '../utils/mutations';
 const SavedBooks = () => {
 
-  const { data } = useQuery( GET_ME );
-  const [removeBook] = useMutation(DELETE_BOOK);
+  const { loading, data } = useQuery(GET_ME);
+  const [removeBook, { error }] = useMutation(DELETE_BOOK);
+  
   const userData = data?.me || {};
+  console.log (userData)
 
-  // use this to determine if `useEffect()` hook needs to run again
   const userDataLength = Object.keys(userData).length; 
 
-  // create function that accepts the book's mongo _id value as param and deletes the book from the database
   const handleDeleteBook = async (bookId) => {
+
     const token = Auth.loggedIn() ? Auth.getToken() : null;
 
     if (!token) {
       return false;
     }
 
-    removeBook(bookId);
-    // upon success, remove book's id from localStorage
+    try {
+      const { data } = await removeBook({ 
+        variables: { bookId }
+      });
+    
     removeBookId(bookId);
-  
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  // if data isn't here yet, say so
-  if (!userDataLength) {
+  if (loading) {
     return <h2>LOADING...</h2>;
   }
-
   return (
     <>
       <Jumbotron fluid className='text-light bg-dark'>
