@@ -12,9 +12,6 @@ const SavedBooks = () => {
   const [removeBook, { error }] = useMutation(DELETE_BOOK);
   
   const userData = data?.me || {};
-  console.log (userData)
-
-  const userDataLength = Object.keys(userData).length; 
 
   const handleDeleteBook = async (bookId) => {
 
